@@ -1,0 +1,17 @@
+*.sqlite3
+
+*.pyc
+__pycache__
+.mypy_cache/
+
+.vscode
+.dmypy.json
+.mypy.ini
+
+dev_files/
+env/
+tmp/
+
+.coverage
+db.sqlite3
+

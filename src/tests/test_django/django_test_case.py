@@ -6,6 +6,7 @@ import os
 
 _django_set_up_done = False
 
+
 class DjangoDependentTestCase(TestCase):
 
     def __init__(self, *args, **kwargs):

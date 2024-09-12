@@ -5,7 +5,7 @@ from src.django import asynchronous
 
 
 @mock.patch(
-    "src.django.asynchronous.logging.send_error_email", 
+    "src.django.asynchronous.logging.send_error_email",
     autospec=True,
 )
 class ExtractResultsWithLoggingTests(

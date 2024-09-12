@@ -29,9 +29,9 @@ thread_locks: dict[str, threading.Lock] = {}
 class InterProcessLock:
 
     def __init__(
-        self, 
-        lock_specifier: str, 
-        timeout: int = -1, 
+        self,
+        lock_specifier: str,
+        timeout: int = -1,
     ) -> None:
         self.lock_specifier = lock_specifier
         if lock_specifier not in thread_locks:
@@ -40,15 +40,23 @@ class InterProcessLock:
 
     @property
     def lock_file_path(self) -> str:
-        return os.path.join(tmp_directory_path, f"{self.lock_specifier}-lockfile.lck")
+        return os.path.join(
+            tmp_directory_path,
+            f"{self.lock_specifier}-lockfile.lck",
+        )
 
     def __enter__(self) -> None:
-        thread_locks[self.lock_specifier].acquire(timeout=self.timeout)
+        thread_locks[self.lock_specifier].acquire(
+            timeout=self.timeout,
+        )
         if not os.path.exists(self.lock_file_path):
             # create lockfile if doesn't exist yet
             open(self.lock_file_path, "x").close()
         self.file_instance = open(self.lock_file_path)
-        fcntl.flock(self.file_instance.fileno(), fcntl.LOCK_EX)
+        fcntl.flock(
+            self.file_instance.fileno(),
+            fcntl.LOCK_EX,
+        )
 
     def __exit__(
         self,

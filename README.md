@@ -16,4 +16,5 @@ Just to acknowledge that these vary in size and complexity
 
 ## Tests
 
-Tests can be run with `python3 -m unittest discover .`
+Tests can be run with `python3 -m unittest discover .`, or by using
+`scripts/run_tests.sh`

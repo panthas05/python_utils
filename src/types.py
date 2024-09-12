@@ -23,4 +23,7 @@ class ThreadedFunction(Protocol):
     ) -> Future[Any]: ...
 
 
-JSON: TypeAlias = dict[str, "JSON"] | list["JSON"] | str | int | float | bool | None
+_JSONTypes: TypeAlias = (
+    dict[str, "_JSONTypes"] | list["_JSONTypes"] | str | int | float | bool | None
+)
+JSON = dict[str, _JSONTypes]

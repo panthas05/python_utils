@@ -2,10 +2,13 @@ from src import gdrive
 from src.testing import external_api
 
 import json
-from requests_toolbelt.multipart import decoder
+from requests_toolbelt.multipart import decoder  # type: ignore
 from unittest import mock
 
 gdrive_file_path = "src.gdrive"
+
+service_account_email = "service@account.com"
+private_key = "private-key-123"
 
 access_token = "access_token"
 
@@ -17,24 +20,28 @@ image_drive_id = "image-id-123"
 image_md5_checksum = "image-md5-checksum"
 
 
-class UploadSmallJpegRequestHandler(
-    external_api.WebRequestHandler,
-):
+class UploadSmallJpegRequestHandler(external_api.WebRequestHandler):
 
-    def do_POST(self):
+    def do_POST(self) -> None:
         # verifying the request
         assert (
             self.url.path == "/upload/drive/v3/files"
         ), "Request made to incorrect path"
+
         assert (
             self.query_data["uploadType"] == "multipart"
         ), "Request should have query param specifying uploadType to be multipart"
+
+        assert self.query_data["supportsAllDrives"] == "True", (
+            "Request should have query param specifying supportsAllDrives to be True "
+            "(needed for shared drives upload)"
+        )
+
+        auth_header = self.headers.get("Authorization")
         assert (
-            self.query_data["supportsAllDrives"] == "True"
-        ), "Request should have query param specifying supportsAllDrives to be True (needed for shared drives upload)"
-        assert (
-            self.headers.get("Authorization") == f"Bearer {access_token}"
-        ), f"Access token not provided in authorization header, got: {self.headers.get("Authorization")}"
+            auth_header == f"Bearer {access_token}"
+        ), f"Access token not provided in authorization header, got: {auth_header}"
+
         request_body = decoder.MultipartDecoder(
             self.post_data,
             self.headers["Content-Type"],
@@ -55,18 +62,26 @@ class UploadSmallJpegRequestHandler(
             raise Exception("Failed to extract metadata from request")
         if request_image_bytes is None:
             raise Exception("Failed to extract image bytes from request")
-        assert (
-            request_image_bytes == image_bytes
-        ), f"Different bytes sent to server, expected {image_bytes}, got {request_image_bytes}"
-        assert request_metadata["parents"] == [
-            parent_folder_id
-        ], f"Upload folder was incorrect, expected {[parent_folder_id]}, got {request_metadata["parents"]}"
+
+        assert request_image_bytes == image_bytes, (
+            f"Different bytes sent to server, expected {image_bytes!r}, got "
+            f"{request_image_bytes!r}"
+        )
+
+        assert request_metadata["parents"] == [parent_folder_id], (
+            f"Upload folder was incorrect, expected {[parent_folder_id]}, got "
+            f"{request_metadata["parents"]}"
+        )
+
         assert (
             request_metadata["name"] == image_name
         ), f"Image name was incorrect, expected {image_name}, got {request_metadata["name"]}"
-        assert (
-            request_metadata["mimeType"] == "image/jpeg"
-        ), f"Mime type was incorrect, expected image/jpeg, got {request_metadata["mimeType"]}"
+
+        assert request_metadata["mimeType"] == "image/jpeg", (
+            f"Mime type was incorrect, expected image/jpeg, got "
+            f"{request_metadata["mimeType"]}"
+        )
+
         # building response
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
@@ -87,12 +102,15 @@ class UploadSmallJpegTests(
 ):
     RequestHandlerClass = UploadSmallJpegRequestHandler
 
-    def test_upload(self, _) -> None:
+    def test_upload(self, _: mock.MagicMock) -> None:
         with mock.patch(
             f"{gdrive_file_path}.GOOGLE_APIS_URL",
             self.test_server_base_url,
         ):
-            gdrive_client = gdrive.GDriveClient()
+            gdrive_client = gdrive.GDriveClient(
+                service_account_email,
+                private_key,
+            )
             try:
                 file_data = gdrive.upload_small_jpeg(
                     gdrive_client,
@@ -113,7 +131,7 @@ class TrashFileExternalApiRequestHandler(
     external_api.WebRequestHandler,
 ):
 
-    def do_PATCH(self):
+    def do_PATCH(self) -> None:
         # verifying the request
         assert (
             self.url.path == f"/drive/v3/files/{image_drive_id}"
@@ -124,9 +142,9 @@ class TrashFileExternalApiRequestHandler(
         assert (
             self.headers.get("Authorization") == f"Bearer {access_token}"
         ), f"Access token not provided in authorization header, got: {self.headers.get("Authorization")}"
-        assert self.json[
-            "trashed"
-        ], '"trashed" should be true in the json posted to gdrive to trash a file'
+        assert (
+            self.json["trashed"] == True
+        ), '"trashed" should be true in the json posted to gdrive to trash a file'
         # building response
         self.send_response(200)
         self.send_header("Content-Type", "text/plain")
@@ -143,12 +161,15 @@ class TrashFileExternalApiTests(
 ):
     RequestHandlerClass = TrashFileExternalApiRequestHandler
 
-    def test_delete(self, _) -> None:
+    def test_delete(self, _: mock.MagicMock) -> None:
         with mock.patch(
             f"{gdrive_file_path}.GOOGLE_APIS_URL",
             self.test_server_base_url,
         ):
-            gdrive_client = gdrive.GDriveClient()
+            gdrive_client = gdrive.GDriveClient(
+                service_account_email,
+                private_key,
+            )
             try:
                 gdrive.trash_file(
                     gdrive_client,

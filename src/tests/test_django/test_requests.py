@@ -14,23 +14,23 @@ class GetRequestIpAddressTests(
     public_ip = "9.188.1.3"
     other_public_ip = "9.188.1.4"
 
-    def test_extracts_remote_address(self):
+    def test_extracts_remote_address(self) -> None:
         request = self.request_factory.get("/")
         request.META["REMOTE_ADDR"] = self.public_ip
         self.assertEqual(requests.get_request_ip_address(request), self.public_ip)
 
-    def test_forwarded_for_overrides_remote_address(self):
+    def test_forwarded_for_overrides_remote_address(self) -> None:
         request = self.request_factory.get("/")
         request.META["REMOTE_ADDR"] = self.public_ip
         request.META["HTTP_X_FORWARDED_FOR"] = self.other_public_ip
         self.assertEqual(requests.get_request_ip_address(request), self.other_public_ip)
 
-    def test_remote_address_skips_private_ips(self):
+    def test_remote_address_skips_private_ips(self) -> None:
         request = self.request_factory.get("/")
         request.META["REMOTE_ADDR"] = "10.188.1.3"
         self.assertEqual(requests.get_request_ip_address(request), "")
 
-    def test_forwarded_for_skips_private_ips(self):
+    def test_forwarded_for_skips_private_ips(self) -> None:
         request = self.request_factory.get("/")
         request.META["HTTP_X_FORWARDED_FOR"] = ",".join(
             (

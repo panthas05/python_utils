@@ -12,20 +12,26 @@ class ExtractResultsWithLoggingTests(
     django_test_case.DjangoDependentTestCase,
     TestCase,
 ):
-    def test_returns_results(self, mock_send_error_email):
+    def test_returns_results(
+        self,
+        mock_send_error_email: mock.MagicMock,
+    ) -> None:
         result = "foo"
         results = asynchronous.extract_results_with_logging([result, result, result])
         self.assertEqual(results, [result, result, result])
         mock_send_error_email.assert_not_called()
 
-    def test_logs_exceptions(self, mock_send_error_email):
+    def test_logs_exceptions(
+        self,
+        mock_send_error_email: mock.MagicMock,
+    ) -> None:
         result = "foo"
         exception = Exception("bar")
         results = asynchronous.extract_results_with_logging([result, exception])
         self.assertEqual(results, [result])
         mock_send_error_email.assert_called_once_with(exception, request=None)
 
-    # def test_raises_when_all_exceptions(self, mock_send_error_email):
+    # def test_raises_when_all_exceptions(self, mock_send_error_email) -> None:
     #     exception = Exception("foo")
     #     with self.assertRaises(ExceptionGroup) as cm:
     #         results = asynchronous.extract_results_with_logging(

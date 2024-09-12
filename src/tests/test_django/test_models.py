@@ -2,7 +2,7 @@
 
 # class GetModelFieldsTests(TestCase):
 
-#     def test_extracts_fields(self):
+#     def test_extracts_fields(self) -> None:
 #         class TestModel(models.Model):
 #             foo = models.CharField(max_length=1)
 #             bar = models.CharField(max_length=1)

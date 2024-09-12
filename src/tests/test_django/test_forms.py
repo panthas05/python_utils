@@ -14,7 +14,7 @@ class ExtractFormErrorsTests(
     django_test_case.DjangoDependentTestCase,
     TestCase,
 ):
-    def test_functionality(self):
+    def test_functionality(self) -> None:
         form = DummyEmailForm({"email": "Not an email"})
         # accessing errors property forces call to is_valid
         errors = forms.extract_form_errors(form)

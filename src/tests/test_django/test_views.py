@@ -1,4 +1,4 @@
-from django.http import HttpResponseBadRequest, HttpResponse
+from django.http import HttpRequest, HttpResponseBadRequest, HttpResponse
 from django.test import RequestFactory
 
 from . import django_test_case
@@ -13,28 +13,28 @@ class AcceptOnlyTests(
 ):
     request_factory = RequestFactory()
 
-    def test_raises_if_no_methods_provided(self):
+    def test_raises_if_no_methods_provided(self) -> None:
         with self.assertRaisesRegex(
             ValueError,
             "No methods provided to accept_only decorator.",
         ) as context_manager:
 
             @views.accept_only([])
-            def dummy_view(request):
+            def dummy_view(request: HttpRequest) -> HttpResponse:
                 return HttpResponse("OK")
 
-    def test_blocks_forbidden_methods(self):
+    def test_blocks_forbidden_methods(self) -> None:
         @views.accept_only(["POST"])
-        def dummy_view(request):
+        def dummy_view(request: HttpRequest) -> HttpResponse:
             return HttpResponse("OK")
 
         response = dummy_view(self.request_factory.get("/"))
         self.assertIsInstance(response, HttpResponseBadRequest)
         self.assertEqual(response.content.decode(), "Only accepts POST requests.")
 
-    def test_permits_accepted_methods(self):
+    def test_permits_accepted_methods(self) -> None:
         @views.accept_only(["GET"])
-        def dummy_view(request):
+        def dummy_view(request: HttpRequest) -> HttpResponse:
             return HttpResponse("OK")
 
         response = dummy_view(self.request_factory.get("/"))

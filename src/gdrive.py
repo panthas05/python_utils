@@ -21,11 +21,14 @@ GDRIVE_ACCESS_TOKEN_CACHE_KEY = "gdrive-auth-token-key"
 GOOGLE_APIS_URL = "https://www.googleapis.com"
 
 
-def _get_gdrive_access_token() -> str:
+def _get_gdrive_access_token(
+    service_account_email: str,
+    private_key: str,
+) -> str:
     return google_apis.get_access_token(
-        settings.GDRIVE_SERVICE_ACCOUNT_EMAIL,
+        service_account_email,
         ["https://www.googleapis.com/auth/drive"],
-        settings.GDRIVE_PRIVATE_KEY,
+        private_key,
         GDRIVE_ACCESS_TOKEN_CACHE_KEY,
     )
 
@@ -41,10 +44,21 @@ class GDriveClient:
 
     session = requests.Session()
 
+    def __init__(
+        self,
+        service_account_email: str,
+        private_key: str,
+    ) -> None:
+        self.service_account_email = service_account_email
+        self.private_key = private_key
+
     def authenticate(self) -> None:
         with self.auth_lock:
             if self.auth_token is None:
-                self.auth_token = _get_gdrive_access_token()
+                self.auth_token = _get_gdrive_access_token(
+                    self.service_account_email,
+                    self.private_key,
+                )
                 if not self.auth_token:
                     raise Exception("Could not authenticate!" + str(self.auth_token))
 

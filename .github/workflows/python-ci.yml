@@ -23,13 +23,10 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.12"
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install \
-          -r requirements/requirements.txt \
-          -r requirements/requirements.dev.txt \
-          -r requirements/requirements.types.txt
+        cache: pip
+    - run: pip install -r requirements/requirements.txt
+    - run: pip install -r requirements/requirements.dev.txt
+    - run: pip install -r requirements/requirements.types.txt
     - name: Reformat with black
       run: |
         python3 -m black .
@@ -38,4 +35,4 @@ jobs:
         python3 -m mypy .
     - name: Test with coverage/unittest
       run: |
-        python3 -m unittest discover .
+        python3 -v -m unittest discover .

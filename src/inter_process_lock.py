@@ -28,7 +28,11 @@ thread_locks: dict[str, threading.Lock] = {}
 
 class InterProcessLock:
 
-    def __init__(self, lock_specifier: str, timeout: int = 10) -> None:
+    def __init__(
+        self, 
+        lock_specifier: str, 
+        timeout: int = -1, 
+    ) -> None:
         self.lock_specifier = lock_specifier
         if lock_specifier not in thread_locks:
             thread_locks[lock_specifier] = threading.Lock()

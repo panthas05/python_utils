@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 class GetJwtTests(TestCase):
     service_account_email = "foo@bar.com"
 
-    def test_generates_valid_signature(self):
+    def test_generates_valid_signature(self) -> None:
         # set up
         private_key = rsa.generate_private_key(
             public_exponent=65537,

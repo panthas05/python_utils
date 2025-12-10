@@ -15,7 +15,11 @@ class GetNextMonthFirstDayTests(TestCase):
     year = 2023
     day = 12
 
-    def test_handles_generic_month(self, mock_date):
+    def test_handles_generic_month(
+        self,
+        mock_date: mock.MagicMock,
+    ) -> None:
+        # set up
         month = 6
         mock_date.today.return_value = date(
             year=self.year,
@@ -27,12 +31,17 @@ class GetNextMonthFirstDayTests(TestCase):
             month=month + 1,
             day=1,
         )
+        # the test itself
         self.assertEqual(
             datetimes.get_next_month_first_day(),
             next_month_first_day,
         )
 
-    def test_handlesyear_transition(self, mock_date):
+    def test_handlesyear_transition(
+        self,
+        mock_date: mock.MagicMock,
+    ) -> None:
+        # set up
         mock_date.today.return_value = date(
             year=self.year,
             month=12,
@@ -43,6 +52,7 @@ class GetNextMonthFirstDayTests(TestCase):
             month=1,
             day=1,
         )
+        # the test itself
         self.assertEqual(
             datetimes.get_next_month_first_day(),
             next_month_first_day,

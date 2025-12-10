@@ -1,3 +1,5 @@
+from src import types
+
 from collections.abc import Callable
 from functools import cached_property
 from http.cookies import SimpleCookie
@@ -6,8 +8,8 @@ import json
 import logging
 import random
 from socketserver import BaseRequestHandler
-from typing import Any, ClassVar
 from threading import Thread
+from typing import Any
 from urllib.parse import parse_qsl, ParseResult, urlparse
 from unittest import TestCase
 
@@ -22,7 +24,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         return urlparse(self.path)
 
     @cached_property
-    def query_data(self) -> dict:
+    def query_data(self) -> dict[str, str]:
         return dict(parse_qsl(self.url.query))
 
     @cached_property
@@ -31,12 +33,12 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         return self.rfile.read(content_length)
 
     @cached_property
-    def form_data(self) -> dict:
+    def form_data(self) -> dict[str, str]:
         return dict(parse_qsl(self.post_data.decode("utf-8")))
 
     @cached_property
-    def json(self) -> dict:
-        request_json: dict = json.loads(self.post_data.decode("utf-8"))
+    def json(self) -> types.JSON:
+        request_json: types.JSON = json.loads(self.post_data.decode("utf-8"))
         return request_json
 
     @cached_property

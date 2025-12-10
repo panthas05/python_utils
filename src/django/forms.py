@@ -41,7 +41,7 @@ class MultipleFileField(forms.FileField):
             single_run_validators(value)
 
 
-DjangoForm = forms.Form | forms.ModelForm
+DjangoForm = forms.Form | forms.ModelForm  # type: ignore
 
 
 def extract_form_errors(form: DjangoForm) -> list[str]:

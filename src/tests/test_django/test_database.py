@@ -19,9 +19,9 @@ class DisconnectDbAfterwardsTests(
         autospec=True,
         name="Close old connections",
     )
-    def test_closes_connection(self, mock_close):
+    def test_closes_connection(self, mock_close: mock.MagicMock) -> None:
         @database.disconnect_db_afterwards
-        def wrapped_function():
+        def wrapped_function() -> None:
             pass
 
         wrapped_function()
@@ -42,7 +42,7 @@ class DisconnectDbAfterwardsTests(
 #         autospec=True,
 #         side_effect=lambda x: None,
 #     )
-#     def test_locks(self, _, mock_info):
+#     def test_locks(self, _, mock_info) -> None:
 #         @database.mutex(name="foo", timeout=1)
 #         def locked_function():
 #             time.sleep(1)

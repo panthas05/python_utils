@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from concurrent.futures import Future
-from typing import Any, Protocol
+from typing import Any, Protocol, TypeAlias
 
 
 class GenericFunction(Protocol):
@@ -21,3 +21,6 @@ class ThreadedFunction(Protocol):
         *args: Any,
         **kwargs: Any,
     ) -> Future[Any]: ...
+
+
+JSON: TypeAlias = dict[str, "JSON" | list["JSON"] | str | int | float | bool | None]

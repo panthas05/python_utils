@@ -39,18 +39,22 @@ class GetGoogleAccessTokenTests(TestCase):
     access_token = "secret123"
     expires_in = 1234
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         super().tearDown()
         cache.clear()
 
-    def _configure_post_mock(self, post_mock):
+    def _configure_post_mock(self, post_mock: mock.MagicMock) -> None:
         response = requests.Response()
         response._content = json.dumps(
             {"access_token": self.access_token, "expires_in": self.expires_in}
         ).encode()
         post_mock.return_value = response
 
-    def test_returns_token(self, post_mock, _):
+    def test_returns_token(
+        self,
+        post_mock: mock.MagicMock,
+        _: mock.MagicMock,
+    ) -> None:
         self._configure_post_mock(post_mock)
         self.assertEqual(
             google_apis.get_access_token(
@@ -64,9 +68,15 @@ class GetGoogleAccessTokenTests(TestCase):
 
     @mock.patch(
         f"{google_apis_filepath}.cache.get",
-        name="Cache",
+        autospec=True,
+        name="Cache get",
     )
-    def test_respects_cache(self, cache_get_mock, post_mock, _):
+    def test_respects_cache(
+        self,
+        cache_get_mock: mock.MagicMock,
+        post_mock: mock.MagicMock,
+        _: mock.MagicMock,
+    ) -> None:
         def side_effect(passed_cache_key: str) -> None:
             self.assertEqual(passed_cache_key, cache_key)
 
@@ -80,9 +90,15 @@ class GetGoogleAccessTokenTests(TestCase):
 
     @mock.patch(
         f"{google_apis_filepath}.cache.set",
-        name="Cache",
+        autospec=True,
+        name="Cache set",
     )
-    def test_cache_timeout(self, cache_set_mock, post_mock, _):
+    def test_cache_timeout(
+        self,
+        cache_set_mock: mock.MagicMock,
+        post_mock: mock.MagicMock,
+        _: mock.MagicMock,
+    ) -> None:
         self._configure_post_mock(post_mock)
         google_apis.get_access_token(
             "foo@bar.com",
@@ -94,10 +110,14 @@ class GetGoogleAccessTokenTests(TestCase):
         call_args, call_kwargs = cache_set_mock.call_args_list[0]
         self.assertEqual(call_kwargs["timeout"], self.expires_in - 10)
 
-    def test_caching(self, post_mock, _):
+    def test_caching(
+        self,
+        post_mock: mock.MagicMock,
+        _: mock.MagicMock,
+    ) -> None:
         self._configure_post_mock(post_mock)
 
-        async def get_access_token():
+        async def get_access_token() -> None:
             await asyncio.sleep(0)
             google_apis.get_access_token(
                 "foo@bar.com",
@@ -107,7 +127,7 @@ class GetGoogleAccessTokenTests(TestCase):
             )
             await asyncio.sleep(0)
 
-        async def get_access_token_many_times():
+        async def get_access_token_many_times() -> None:
             tasks = [asyncio.create_task(get_access_token()) for x in range(100)]
             await asyncio.gather(*tasks)
 

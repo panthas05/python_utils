@@ -5,4 +5,5 @@ cd ../
 export DJANGO_SETTINGS_MODULE=django_settings
 
 source env/bin/activate
-python3 -m unittest discover .
+coverage run -m unittest discover .
+coverage report -m

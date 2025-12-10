@@ -2,8 +2,10 @@
 A simple lockfile implementation, see:
 https://stackoverflow.com/questions/6931342/system-wide-mutex-in-python-on-linux
 
-Needed because WSGO spawns four processes independently, meaning
-multiprocessing.Lock won't work
+Written for a context where a lock needs to be created which will lock processes
+that weren't spawned by the process creating the lock. As such, implements
+locking using the shared filesystem and fcntl (meaning this implementation only
+works on Linux).
 """
 
 import fcntl

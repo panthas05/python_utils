@@ -21,7 +21,6 @@ SHOULD_CREATE_ENV=true
 if [ -d env ]; then
     SHOULD_DELETE_ENV=1
     yes_or_no "Recreate virtual environment?" && SHOULD_DELETE_ENV=0
-    echo "$SHOULD_DELETE_ENV"
     if [[ $SHOULD_DELETE_ENV == 0 ]]; then 
         echo "Deleting old virtual environment"
         rm -r env
@@ -38,9 +37,9 @@ if $SHOULD_CREATE_ENV; then
     source env/bin/activate
     python3 -m pip install --upgrade pip
     python3 -m pip install \
-        -r requirements.txt \
-        -r requirements.dev.txt \
-        -r requirements.types.txt
+        -r requirements/requirements.txt \
+        -r requirements/requirements.dev.txt \
+        -r requirements/requirements.types.txt
     echo "Virtual environment created"
     echo ""
 fi

@@ -9,8 +9,6 @@ python versions.
 ## Todos
 Just to acknowledge that these vary in size and complexity
 - Finish this readme more properly
-- Move requirements files to directory
-- Write script for setting up dev env
 - Set up automated testing, probably using github actions (and black
   formatting/mypy typechecking? badges would be fun too!)
 - Convert into a python package at some point for ease of use in other projects
